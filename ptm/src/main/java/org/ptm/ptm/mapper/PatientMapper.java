@@ -29,4 +29,16 @@ public class PatientMapper {
 
         return pat;
     }
+
+    public static Patient updateMapper(Patient pat,PatientRequestDto p)
+    {
+        pat.setName(p.getName());
+        pat.setAddress(p.getAddress());
+        pat.setEmail(p.getEmail());
+        pat.setDateOfBirth(LocalDate.parse(p.getDateOfBirth()));
+
+        return pat;
+
+    }
+
 }

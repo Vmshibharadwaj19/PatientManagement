@@ -1,5 +1,7 @@
 package org.ptm.ptm.service;
 
+import org.ptm.ptm.Exception.EmailAlreadyExists;
+import org.ptm.ptm.Exception.PatientNotFoundException;
 import org.ptm.ptm.Repository.PatientRepo;
 import org.ptm.ptm.dto.patientdto;
 import org.ptm.ptm.model.Patient;
@@ -9,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 import org.ptm.ptm.mapper.PatientMapper;
 import org.ptm.ptm.dto.patientdto;
 import org.ptm.ptm.dto.PatientRequestDto;
@@ -42,5 +46,21 @@ public class PatientService {
           return PatientMapper.patientMapper(newPatient);
 
    }
+   public  patientdto updatePatient(UUID id)
+   {
+       Patient patient=patientRepo.findById(id).orElseThrow(() -> new PatientNotFoundException());
+       patientdto patientdto=PatientMapper.patientMapper(patient);
+
+       return patientdto;
+   }
+
+   public patientdto updatePatientByEmail(UUID id,PatientRequestDto p)
+   {
+       Patient patient=patientRepo.findById(id).orElseThrow(() -> new PatientNotFoundException());
+      patientRepo.save(PatientMapper.updateMapper(patient,p));
+       patientdto dto=PatientMapper.patientMapper(patient);
+       return dto;
+   }
+
 
 }

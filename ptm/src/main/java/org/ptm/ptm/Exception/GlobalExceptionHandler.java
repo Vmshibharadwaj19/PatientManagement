@@ -29,4 +29,19 @@ public class GlobalExceptionHandler {
 
         });         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
+
+    @ExceptionHandler(EmailAlreadyExists.class)
+    public ResponseEntity<Map<String,String>> handleException(EmailAlreadyExists e) {
+        Map<String,String> map = new HashMap<>();
+        map.put("message","Email already exists");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
+    }
+    @ExceptionHandler(PatientNotFoundException.class)
+    public ResponseEntity<Map<String,String>> handlePatientNotFound(PatientNotFoundException e) {
+        Map<String,String> map = new HashMap<>();
+        map.put("message","Patient not found");
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
+    }
 }
