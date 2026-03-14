@@ -1,7 +1,6 @@
 package org.ptm.ptm;
 
 import jakarta.validation.Valid;
-import org.ptm.ptm.model.Patient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +9,7 @@ import org.ptm.ptm.dto.PatientRequestDto;
 import org.ptm.ptm.service.PatientService;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/patients")
@@ -33,4 +33,19 @@ public class ParientController {
          return ResponseEntity.status(HttpStatus.CREATED).body( pa);
 
     }
+        @GetMapping("/{id}")
+        public ResponseEntity<patientdto> getPatientById(@PathVariable UUID id)
+        {
+           patientdto p= ps.updatePatient(id);
+
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(p);
+        }
+
+        @PutMapping("/{id}")
+    public ResponseEntity<patientdto> updatePatient(@PathVariable UUID id, @Valid @RequestBody PatientRequestDto p)
+        {
+           patientdto pd= ps.updatePatientByEmail(id, p);
+
+              return ResponseEntity.status(HttpStatus.ACCEPTED).body(pd);
+        }
 }
