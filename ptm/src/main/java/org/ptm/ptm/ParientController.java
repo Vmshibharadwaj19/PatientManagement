@@ -48,4 +48,10 @@ public class ParientController {
 
               return ResponseEntity.status(HttpStatus.ACCEPTED).body(pd);
         }
+        @DeleteMapping("{email}")
+    public ResponseEntity DeletePatient(@PathVariable String email)
+        {
+            ps.deletePatient(email);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        }
 }

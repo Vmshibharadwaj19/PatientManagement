@@ -1,5 +1,6 @@
 package org.ptm.ptm.service;
 
+import jakarta.transaction.Transactional;
 import org.ptm.ptm.Exception.EmailAlreadyExists;
 import org.ptm.ptm.Exception.PatientNotFoundException;
 import org.ptm.ptm.Repository.PatientRepo;
@@ -57,10 +58,27 @@ public class PatientService {
    public patientdto updatePatientByEmail(UUID id,PatientRequestDto p)
    {
        Patient patient=patientRepo.findById(id).orElseThrow(() -> new PatientNotFoundException());
-      patientRepo.save(PatientMapper.updateMapper(patient,p));
-       patientdto dto=PatientMapper.patientMapper(patient);
+       //if(patient.getId()!=id  && patientRepo.existsByEmail(p.getEmail()))
+       if(patientRepo.existsByEmailAndIdNot(p.getEmail(),id))
+       {
+           throw new EmailAlreadyExists("Email already exists");
+       }
+           patientRepo.save(PatientMapper.updateMapper(patient, p));
+           patientdto dto = PatientMapper.patientMapper(patient);
        return dto;
+       //if(patientRepo.existsByEmailAndIdNot(p.getEmail(),id))
+
    }
+
+    @Transactional
+    public void deletePatient(String email) {
+
+        long deleted = patientRepo.deleteByEmail(email);
+
+        if (deleted == 0) {
+            throw new PatientNotFoundException();
+        }
+    }
 
 
 }
