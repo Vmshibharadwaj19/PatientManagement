@@ -5,6 +5,7 @@ import org.ptm.ptm.Exception.EmailAlreadyExists;
 import org.ptm.ptm.Exception.PatientNotFoundException;
 import org.ptm.ptm.Repository.PatientRepo;
 import org.ptm.ptm.dto.patientdto;
+import org.ptm.ptm.grpc.BillingServiceGrpcClient;
 import org.ptm.ptm.model.Patient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -23,9 +24,11 @@ import org.ptm.ptm.dto.PatientRequestDto;
 public class PatientService {
 
     private PatientRepo patientRepo;
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
 
-    PatientService(PatientRepo patientRepo) {
+    PatientService(PatientRepo patientRepo,BillingServiceGrpcClient billingServiceGrpcClient) {
         this.patientRepo = patientRepo;
+        this.billingServiceGrpcClient = billingServiceGrpcClient;
     }
     public List<patientdto>patientRepoList(){
         List<Patient>  patients=patientRepo.findAll();
@@ -37,16 +40,35 @@ public class PatientService {
         return patientdtos;
 
     }
-   public patientdto createPatient(PatientRequestDto pp)
-   {    if(patientRepo.existsByEmail(pp.getEmail()))
-   {
+//   public patientdto createPatient(PatientRequestDto pp)
+//   {    if(patientRepo.existsByEmail(pp.getEmail()))
+//   {
+//        throw new EmailAlreadyExists("Email already exists");
+//   }
+//          Patient newPatient=patientRepo.save(PatientMapper.toPatient(pp));
+//       billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(),newPatient.getName(),newPatient.getEmail());
+//          return PatientMapper.patientMapper(newPatient);
+//
+//   }
+public patientdto createPatient(PatientRequestDto pp) {
+
+    if (patientRepo.existsByEmail(pp.getEmail())) {
         throw new EmailAlreadyExists("Email already exists");
-   }
-          Patient newPatient=patientRepo.save(PatientMapper.toPatient(pp));
+    }
 
-          return PatientMapper.patientMapper(newPatient);
+    Patient newPatient = patientRepo.save(PatientMapper.toPatient(pp));
 
-   }
+    try {
+        billingServiceGrpcClient.createBillingAccount(
+                newPatient.getId().toString(),
+                newPatient.getName(),
+                newPatient.getEmail());
+    } catch (Exception e) {
+        System.out.println("Billing service failed: " + e.getMessage());
+    }
+
+    return PatientMapper.patientMapper(newPatient);
+}
    public  patientdto updatePatient(UUID id)
    {
        Patient patient=patientRepo.findById(id).orElseThrow(() -> new PatientNotFoundException());

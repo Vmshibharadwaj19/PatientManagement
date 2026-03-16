@@ -35,7 +35,7 @@ public class ParientController {
 
          patientdto pa= ps.createPatient(p);
 
-         return ResponseEntity.status(HttpStatus.CREATED).body( pa);
+         return ResponseEntity.status(HttpStatus.CREATED).body(pa);
 
     }
         @GetMapping("/{id}")
